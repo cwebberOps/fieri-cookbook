@@ -1,0 +1,10 @@
+name             'fieri'
+maintainer       ''
+maintainer_email ''
+license          ''
+description      'Installs/Configures fieri'
+long_description 'Installs/Configures fieri'
+version          '0.1.0'
+
+depends          'apt'
+depends          'redisio'

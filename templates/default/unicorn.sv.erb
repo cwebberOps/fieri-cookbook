@@ -1,0 +1,4 @@
+#!/bin/sh
+exec 2>&1
+cd /srv/fieri/current
+exec chpst -ufieri -P bundle exec unicorn -E production -c /srv/fieri/shared/unicorn.rb
