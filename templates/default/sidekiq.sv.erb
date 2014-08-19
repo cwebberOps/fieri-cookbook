@@ -1,5 +1,5 @@
 #!/bin/sh
 exec 2>&1
 
-cd /srv/fieri/current
-exec chpst -ufieri -P bundle exec sidekiq -e production -t 30 -r /srv/fieri/current/lib/app.rb -L /srv/fieri/shared/log/sidekiq.log
+cd <%= "#{node['fieri']['home']}/current" %>
+exec chpst -ufieri -P bundle exec sidekiq -e production -t 30 -r <%= "#{node['fieri']['home']}/current/lib/app.rb" %> -L <%= "#{node['fieri']['home']}/shared/log/sidekiq.log" %>

@@ -14,30 +14,42 @@ end
 user 'fieri' do
   gid 'fieri'
   system true
-  home '/srv/fieri'
+  home node['fieri']['home']
   comment 'Fieri'
   shell '/bin/bash'
 end
 
-directory '/srv/fieri/shared' do
+directory "#{node['fieri']['home']}/shared" do
   user 'fieri'
   group 'fieri'
   mode 0755
   recursive true
 end
 
-directory '/srv/fieri/shared/log' do
+directory "#{node['fieri']['home']}/log" do
   user 'fieri'
   group 'fieri'
   mode 0755
   recursive true
 end
 
-template '/srv/fieri/shared/unicorn.rb' do
+app = data_bag_item(:apps, node['fieri']['data_bag'])
+
+template "#{node['fieri']['home']}/shared/.env.production" do
+  variables(app: app)
+
+  user 'fieri'
+  group 'fieri'
+
+  notifies :restart, 'service[unicorn]'
+  notifies :restart, 'service[sidekiq]'
+end
+
+template "#{node['fieri']['home']}/shared/unicorn.rb" do
   source 'unicorn.rb.erb'
 end
 
-deploy_revision '/srv/fieri' do
+deploy_revision node['fieri']['home'] do
   repo 'https://github.com/opscode/fieri.git'
   revision 'master'
   user 'fieri'
@@ -50,6 +62,14 @@ deploy_revision '/srv/fieri' do
     execute 'bundle install' do
       cwd release_path
       command 'bundle install --without test development --path=vendor/bundle'
+    end
+
+    link "#{node['fieri']['home']}/current/.env" do
+      to "#{node['fieri']['home']}/shared/.env.production"
+    end
+
+    link "#{node['fieri']['home']}/current/log" do
+      to "#{node['fieri']['home']}/shared/log"
     end
   end
 
